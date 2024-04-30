@@ -1,6 +1,11 @@
 package com.github.coderodde.fun.bits.predictor.util;
 
 import com.github.coderodde.fun.bits.predictor.BitFrequencies;
+import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 public final class BitStringTree {
     
@@ -11,6 +16,7 @@ public final class BitStringTree {
     }
     
     private BitStringTreeNode root;
+    private int size;
     
     public void add(final boolean[] bitString, final boolean predictedBit) {
         if (root == null) {
@@ -41,6 +47,7 @@ public final class BitStringTree {
         
         if (bitFrequencies == null) {
             current.bitFrequencies = bitFrequencies = new BitFrequencies();
+            size++;
         }
         
         if (predictedBit) {
@@ -72,5 +79,45 @@ public final class BitStringTree {
         }
         
         return node.bitFrequencies;
+    }
+    
+    public int size() {
+        return size;
+    }
+    
+    public List<boolean[]> toList() {
+        final List<boolean[]> list = new ArrayList<>(size);
+        final Deque<Boolean> bitStack = new ArrayDeque<>();
+        
+        toListImpl(list, bitStack, root);
+        
+        return list;
+    }
+    
+    private static boolean[] toBooleanArray(final Deque<Boolean> bitStack) {
+        final boolean[] bitArray = new boolean[bitStack.size()];
+        int i = 0;
+        
+        for (final Boolean bit : bitStack) {
+            bitArray[i++] = bit;
+        }
+        
+        return bitArray;
+    }
+    
+    public void toListImpl(final List<boolean[]> list, 
+                           final Deque<Boolean> bitStack,
+                           final BitStringTreeNode node) {
+        if (node == null) {
+            return;
+        }
+        
+        if (node.bitFrequencies != null) {
+            list.addAll(toBooleanArray(bitStack));
+        }
+        
+        if (node.bit0Child != null) {
+            list
+        }
     }
 }

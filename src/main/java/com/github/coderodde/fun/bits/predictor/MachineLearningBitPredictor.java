@@ -1,6 +1,7 @@
 package com.github.coderodde.fun.bits.predictor;
 
 import static com.github.coderodde.fun.bits.predictor.Utils.checkIsPositiveValue;
+import com.github.coderodde.fun.bits.predictor.util.BitStringTree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,8 +20,8 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     private final boolean[] bits;
     private final int maximumPatternLength;
     private final Random random;
-    private final Map<BitString, BitFrequencies> map = new HashMap<>();
-    
+    private final BitStringTree bitStringTree = new BitStringTree();
+
     public MachineLearningBitPredictor(final boolean[] bits, 
                                        final int maximumPatternLength,
                                        final Random random) {
@@ -31,7 +32,6 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         
         this.random = Objects.requireNonNull(random,
                                              "The input Random is null.");
-        
         process();
     }
     
@@ -42,28 +42,26 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     
     @Override
     public boolean predict(final boolean[] bitString) {
-        final BitFrequencies tentativeBitDistribution = new BitFrequencies();
-        
-        for (final Map.Entry<BitString, BitFrequencies> e : map.entrySet()) {
-            final boolean[] pattern = e.getKey().getBitArray();
+        for (int patternLength = maximumPatternLength; 
+                 patternLength > 0; 
+                 patternLength--) {
             
-            if (pattern.length > bitString.length) {
-                // Once here, the current pattern is longer than the input bit
-                // string; omit it.
+            if (patternLength > bitString.length) {
                 continue;
             }
             
             final BitString patternSuffix = 
-                    getPatternSuffix(
-                            pattern, 
-                            bitString.length);
+                    getPatternSuffix(bitString, patternLength);
             
-            if (map.containsKey(patternSuffix)) {
-                tentativeBitDistribution.add(map.get(patternSuffix));
+            final BitFrequencies bitFrequencies =
+                    bitStringTree.get(patternSuffix.getBitArray());
+            
+            if (bitFrequencies != null) {
+                return bitFrequencies.sample(random);
             }
         }
         
-        return tentativeBitDistribution.sample(random);
+        throw new IllegalStateException("Should not get here.");
     }
     
     @Override
@@ -108,7 +106,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                         maximum0BitCountlength,
                         maximum1BitCountLength);
         
-        final List<String> stringList = new ArrayList<>(map.size());
+        final List<String> stringList = new ArrayList<>(bitStringTree.size());
         
         for (final Map.Entry<BitString, BitFrequencies> e : map.entrySet()) {
             stringList.add(
@@ -122,9 +120,10 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         stringList.sort(String::compareTo);
         
         final StringBuilder stringBuilder = new StringBuilder();
-        final int numberOfLines = map.size();
+        final int numberOfLines = bitStringTree.size();
         final int lineNumberStringMaximumLength = 
                 Integer.toString(numberOfLines).length();
+        
         final String fmt2 = String.format("Line %%%dd: %%s.\n",
                                           lineNumberStringMaximumLength);
         
@@ -208,24 +207,16 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         }
         
         final boolean bitToPredict = bits[patternStartIndex + patternLength];
-        final BitString patternBitString = new BitString(pattern);
+        final BitFrequencies bitFrequencies = bitStringTree.get(pattern);
         
-        if (map.containsKey(patternBitString)) {
+        if (bitFrequencies != null) {
             if (bitToPredict) {
-                map.get(patternBitString).bit[1]++;
+                bitFrequencies.bit[1]++;
             } else {
-                map.get(patternBitString).bit[0]++;
+                bitFrequencies.bit[0]++;
             }
         } else {
-            final BitFrequencies bitFrequenices = new BitFrequencies();
-            
-            if (bitToPredict) {
-                bitFrequenices.bit[1] = 1;
-            } else {
-                bitFrequenices.bit[0] = 1;
-            }
-            
-            map.put(patternBitString, bitFrequenices);
+            bitStringTree.add(pattern, bitToPredict);
         }
     }
 }
