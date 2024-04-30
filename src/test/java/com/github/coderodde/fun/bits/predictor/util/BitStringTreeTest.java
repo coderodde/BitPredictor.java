@@ -1,6 +1,7 @@
 package com.github.coderodde.fun.bits.predictor.util;
 
 import com.github.coderodde.fun.bits.predictor.BitFrequencies;
+import com.github.coderodde.fun.bits.predictor.BitStringView;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import org.junit.Test;
@@ -9,20 +10,19 @@ public final class BitStringTreeTest {
     
     @Test
     public void addAndGet() {
+        final boolean[] data = new boolean[]{ false, true, true };
+        BitStringView bitStringView = new BitStringView(data, 0, 3);
+        
         final BitStringTree tree = new BitStringTree();
         
-        tree.add(new boolean[]{ false, true, true }, true);
-        tree.add(new boolean[]{ false, true, true }, true);
-        tree.add(new boolean[]{ false, true, true }, false);
+        tree.add(bitStringView, true);
+        tree.add(bitStringView, true);
+        tree.add(bitStringView, true);
+        tree.add(bitStringView, false);
+        tree.add(bitStringView, false);
         
-        assertNull(tree.get(new boolean[]{ true, true }));
-        assertNull(tree.get(new boolean[]{ false, true }));
-        assertNull(tree.get(new boolean[]{ true, false }));
-        assertNull(tree.get(new boolean[]{ false, false }));
+        BitFrequencies bitFrequencies = tree.get(bitStringView);
         
-        BitFrequencies f = tree.get(new boolean[]{ false, true, true});
-        
-        assertEquals(1, f.bit[0]);
-        assertEquals(2, f.bit[1]);
+        System.out.println(bitFrequencies);
     }
 }

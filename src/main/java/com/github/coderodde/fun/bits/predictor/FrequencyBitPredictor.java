@@ -24,7 +24,7 @@ public final class FrequencyBitPredictor implements BitPredictor {
     }
     
     @Override
-    public boolean predict(boolean[] bitString) {
+    public boolean predict(final BitStringView bitStringView) {
         return bitFrequencies.sample(random);
     }
     
