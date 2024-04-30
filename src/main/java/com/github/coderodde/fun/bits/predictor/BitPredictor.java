@@ -17,7 +17,9 @@ public interface BitPredictor {
     /**
      * Predicts an array of the same length as the internal learning bit string.
      * 
+     * @param length the length of the predicted bit string.
+     * 
      * @return the predicted bit string.
      */
-    public boolean[] predictArray();
+    public boolean[] predictArray(final int length);
 }

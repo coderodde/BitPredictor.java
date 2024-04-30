@@ -1,5 +1,6 @@
 package com.github.coderodde.fun.bits.predictor;
 
+import static com.github.coderodde.fun.bits.predictor.Utils.checkIsPositiveValue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,12 +67,16 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     }
     
     @Override
-    public boolean[] predictArray() {
+    public boolean[] predictArray(final int length) {
+        checkIsPositiveValue(
+                length,
+                String.format(
+                        "The length is too small (%d). Must be at least 1.",
+                        length));
+        
         final boolean[] predictedArray = new boolean[bits.length];
         
         predictedArray[0] = bits[0];
-        
-        
         
         return predictedArray;
     }
@@ -93,15 +98,15 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     
     @Override
     public String toString() {
-        final int maximumOnBitCountLength  = getMaximumOnBitCountLength();
-        final int maximumOffBitCountlength = getMaximumOffBitCountLength();
+        final int maximum1BitCountLength = getMaximum1BitCountLength();
+        final int maximum0BitCountlength = getMaximum0BitCountLength();
         
         final String fmt = 
                 String.format(
                         "bits = %%%ds, 0s = %%%dd, 1s = %%%dd.",
                         maximumPatternLength,
-                        maximumOffBitCountlength,
-                        maximumOnBitCountLength);
+                        maximum0BitCountlength,
+                        maximum1BitCountLength);
         
         final List<String> stringList = new ArrayList<>(map.size());
         
@@ -110,8 +115,8 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                     String.format(
                             fmt,
                             e.getKey(), 
-                            e.getValue().offBits,
-                            e.getValue().onBits));
+                            e.getValue().bit[0],
+                            e.getValue().bit[1]));
         }
         
         stringList.sort(String::compareTo);
@@ -138,21 +143,21 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         return stringBuilder.toString();
     }
     
-    private int getMaximumOnBitCountLength() {
+    private int getMaximum1BitCountLength() {
         int maximumValue = 0;
         
         for (final BitFrequencies bitFrequencies : map.values()) {
-            maximumValue = Math.max(maximumValue, bitFrequencies.onBits);
+            maximumValue = Math.max(maximumValue, bitFrequencies.bit[1]);
         }
         
         return String.valueOf(maximumValue).length();
     }
     
-    private int getMaximumOffBitCountLength() {
+    private int getMaximum0BitCountLength() {
         int maximumValue = 0;
         
         for (final BitFrequencies bitFrequencies : map.values()) {
-            maximumValue = Math.max(maximumValue, bitFrequencies.offBits);
+            maximumValue = Math.max(maximumValue, bitFrequencies.bit[0]);
         }
         
         return String.valueOf(maximumValue).length();
@@ -207,17 +212,17 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         
         if (map.containsKey(patternBitString)) {
             if (bitToPredict) {
-                map.get(patternBitString).onBits++;
+                map.get(patternBitString).bit[1]++;
             } else {
-                map.get(patternBitString).offBits++;
+                map.get(patternBitString).bit[0]++;
             }
         } else {
             final BitFrequencies bitFrequenices = new BitFrequencies();
             
             if (bitToPredict) {
-                bitFrequenices.onBits = 1;
+                bitFrequenices.bit[1] = 1;
             } else {
-                bitFrequenices.offBits = 1;
+                bitFrequenices.bit[0] = 1;
             }
             
             map.put(patternBitString, bitFrequenices);

@@ -1,5 +1,6 @@
 package com.github.coderodde.fun.bits.predictor;
 
+import static com.github.coderodde.fun.bits.predictor.Utils.checkIsPositiveValue;
 import java.util.Objects;
 import java.util.Random;
 
@@ -28,10 +29,16 @@ public final class FrequencyBitPredictor implements BitPredictor {
     }
     
     @Override
-    public boolean[] predictArray() {
+    public boolean[] predictArray(final int length) {
+        checkIsPositiveValue(
+                length,
+                String.format(
+                        "The length is too small (%d). Must be at least 1.",
+                        length));
+        
         final boolean[] bitString = new boolean[learningBitString.length];
         
-        for (int i = 0; i < bitString.length; i++) {
+        for (int i = 0; i < length; i++) {
             bitString[i] = bitFrequencies.sample(random);
         }
         
@@ -41,9 +48,9 @@ public final class FrequencyBitPredictor implements BitPredictor {
     private void process() {
         for (final boolean bit : learningBitString) {
             if (bit) {
-                bitFrequencies.onBits++;
+                bitFrequencies.bit[1]++;
             } else {
-                bitFrequencies.offBits++;
+                bitFrequencies.bit[0]++;
             }
         }
     }
