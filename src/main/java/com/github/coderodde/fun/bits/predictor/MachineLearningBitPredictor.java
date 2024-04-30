@@ -1,13 +1,14 @@
 package com.github.coderodde.fun.bits.predictor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
 /**
  * This class implements a 
- * @author rodio
  */
 public final class MachineLearningBitPredictor implements BitPredictor {
     
@@ -17,7 +18,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     private final boolean[] bits;
     private final int maximumPatternLength;
     private final Random random;
-    private final Map<boolean[], BitFrequencies> map = new HashMap<>();
+    private final Map<BitString, BitFrequencies> map = new HashMap<>();
     
     public MachineLearningBitPredictor(final boolean[] bits, 
                                        final int maximumPatternLength,
@@ -42,8 +43,8 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     public boolean predict(final boolean[] bitString) {
         final BitFrequencies tentativeBitDistribution = new BitFrequencies();
         
-        for (final Map.Entry<boolean[], BitFrequencies> e : map.entrySet()) {
-            final boolean[] pattern = e.getKey();
+        for (final Map.Entry<BitString, BitFrequencies> e : map.entrySet()) {
+            final boolean[] pattern = e.getKey().getBitArray();
             
             if (pattern.length > bitString.length) {
                 // Once here, the current pattern is longer than the input bit
@@ -51,7 +52,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                 continue;
             }
             
-            final boolean[] patternSuffix = 
+            final BitString patternSuffix = 
                     getPatternSuffix(
                             pattern, 
                             bitString.length);
@@ -75,7 +76,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         return predictedArray;
     }
     
-    private static boolean[] getPatternSuffix(final boolean[] pattern, 
+    private static BitString getPatternSuffix(final boolean[] pattern, 
                                               final int suffixLength) {
         
         final boolean[] patternSuffix = new boolean[suffixLength];
@@ -87,18 +88,49 @@ public final class MachineLearningBitPredictor implements BitPredictor {
             patternSuffix[j] = pattern[i];
         }
         
-        return patternSuffix;
+        return new BitString(patternSuffix);
     }
     
     @Override
     public String toString() {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final int maximumOnBitCountLength  = getMaximumOnBitCountLength();
+        final int maximumOffBitCountlength = getMaximumOffBitCountLength();
         
-        for (final Map.Entry<boolean[], BitFrequencies> e : map.entrySet()) {
-            stringBuilder.append(booleanArrayToBitString(e.getKey()))
-                         .append(" ")
-                         .append(e.getValue())
-                         .append("\n");
+        final String fmt = 
+                String.format(
+                        "bits = %%%ds, 0s = %%%dd, 1s = %%%dd.",
+                        maximumPatternLength,
+                        maximumOffBitCountlength,
+                        maximumOnBitCountLength);
+        
+        final List<String> stringList = new ArrayList<>(map.size());
+        
+        for (final Map.Entry<BitString, BitFrequencies> e : map.entrySet()) {
+            stringList.add(
+                    String.format(
+                            fmt,
+                            e.getKey(), 
+                            e.getValue().offBits,
+                            e.getValue().onBits));
+        }
+        
+        stringList.sort(String::compareTo);
+        
+        final StringBuilder stringBuilder = new StringBuilder();
+        final int numberOfLines = map.size();
+        final int lineNumberStringMaximumLength = 
+                Integer.toString(numberOfLines).length();
+        final String fmt2 = String.format("Line %%%dd: %%s.\n",
+                                          lineNumberStringMaximumLength);
+        
+        int lineNumber = 1;
+        
+        for (final String string : stringList) {
+            stringBuilder.append(
+                    String.format(
+                            fmt2, 
+                            lineNumber++, 
+                            string));
         }
         
         // Delete the concluding "\n":
@@ -106,14 +138,24 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         return stringBuilder.toString();
     }
     
-    private static String booleanArrayToBitString(final boolean[] bits) {
-        final StringBuilder stringBuilder = new StringBuilder();
+    private int getMaximumOnBitCountLength() {
+        int maximumValue = 0;
         
-        for (final boolean bit : bits) {
-            stringBuilder.append((bit ? "1" : "0"));
+        for (final BitFrequencies bitFrequencies : map.values()) {
+            maximumValue = Math.max(maximumValue, bitFrequencies.onBits);
         }
         
-        return stringBuilder.toString();
+        return String.valueOf(maximumValue).length();
+    }
+    
+    private int getMaximumOffBitCountLength() {
+        int maximumValue = 0;
+        
+        for (final BitFrequencies bitFrequencies : map.values()) {
+            maximumValue = Math.max(maximumValue, bitFrequencies.offBits);
+        }
+        
+        return String.valueOf(maximumValue).length();
     }
     
     private int checkMaximumPatternLength(final int maximumPatternLength) {
@@ -151,6 +193,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     
     private void loadPattern(final int patternStartIndex, 
                              final int patternLength) {
+        
         final boolean[] pattern = new boolean[patternLength];
         
         for (int i = patternStartIndex;
@@ -160,12 +203,13 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         }
         
         final boolean bitToPredict = bits[patternStartIndex + patternLength];
+        final BitString patternBitString = new BitString(pattern);
         
-        if (map.containsKey(pattern)) {
+        if (map.containsKey(patternBitString)) {
             if (bitToPredict) {
-                map.get(pattern).onBits++;
+                map.get(patternBitString).onBits++;
             } else {
-                map.get(pattern).offBits++;
+                map.get(patternBitString).offBits++;
             }
         } else {
             final BitFrequencies bitFrequenices = new BitFrequencies();
@@ -176,7 +220,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                 bitFrequenices.offBits = 1;
             }
             
-            map.put(pattern, bitFrequenices);
+            map.put(patternBitString, bitFrequenices);
         }
     }
 }
