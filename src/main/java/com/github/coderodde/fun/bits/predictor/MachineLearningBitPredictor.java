@@ -60,8 +60,10 @@ public final class MachineLearningBitPredictor implements BitPredictor {
             final BitFrequencies bitFrequencies = 
                     bitStringTree.get(patternSuffixView);
             
-            // Sample the bit:
-            return bitFrequencies.sample(random);
+            if (bitFrequencies != null) {
+                // Sample the bit:
+                return bitFrequencies.sample(random);
+            }
         }
         
         throw new IllegalStateException("Should not get here.");
@@ -75,7 +77,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                         "The length is too small (%d). Must be at least 1.",
                         length));
         
-        final boolean[] predictedArray = new boolean[bits.length];
+        final boolean[] predictedArray = new boolean[length];
         
         for (int i = 0; i < length; i++) {
             final BitStringView bitStringView =
@@ -151,9 +153,9 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         
         if (bitFrequencies != null) {
             if (bitToPredict) {
-                bitFrequencies.bit[1]++;
+                bitFrequencies.inc1();
             } else {
-                bitFrequencies.bit[0]++;
+                bitFrequencies.inc0();
             }
         } else {
             bitStringTree.add(pattern, bitToPredict);

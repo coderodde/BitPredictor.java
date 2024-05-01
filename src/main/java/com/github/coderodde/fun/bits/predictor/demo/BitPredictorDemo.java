@@ -5,20 +5,21 @@ import com.github.coderodde.fun.bits.predictor.BitStringView;
 import com.github.coderodde.fun.bits.predictor.FrequencyBitPredictor;
 import com.github.coderodde.fun.bits.predictor.MachineLearningBitPredictor;
 import com.github.coderodde.fun.bits.predictor.Utils;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 public final class BitPredictorDemo {
     
-    private static final int LEARNING_BIT_STRING_LENGTH = 1_000_000;
+    private static final int LEARNING_BIT_STRING_LENGTH = 10;
     private static final int PREDICTED_BIT_STRING_LENGTH =
             LEARNING_BIT_STRING_LENGTH;
     
-    private static final int PATTERN_LENGTH = 6;
+    private static final int PATTERN_LENGTH = 20;
     
     public static void main(final String[] args) {
-        final long seed = System.currentTimeMillis();
+        final long seed = 1714559375492L; //System.currentTimeMillis();
         final Random random = new Random(seed);
         System.out.printf("Seed = %d.\n", seed);
         
@@ -83,12 +84,14 @@ public final class BitPredictorDemo {
                                                      .getSimpleName(),
                           end - start);
         
-        System.out.printf("Similarity by %s is %.4f percent.\n",
+        System.out.println();
+        
+        System.out.printf("Similarity by %s is %.1f percent.\n",
                           frequencyBitPredictor.getClass().getSimpleName(),
                           Utils.getSimilarityPercent(predictedArray1, 
                                                      learningBitString));
         
-        System.out.printf("Similarity by %s is %.4f percent.\n",
+        System.out.printf("Similarity by %s is %.1f percent.\n",
                           machineLearningBitPredictor.getClass()
                                                      .getSimpleName(),
                           Utils.getSimilarityPercent(predictedArray2, 
@@ -131,12 +134,14 @@ public final class BitPredictorDemo {
                 machineLearningBitPredictor.getClass().getSimpleName(), 
                 end - start);
         
-        System.out.printf("Similarity by %s is %.4f percent.\n",
+        System.out.println();
+        
+        System.out.printf("Similarity by %s is %.1f percent.\n",
                           frequencyBitPredictor.getClass().getSimpleName(),
                           Utils.getSimilarityPercent(predictedArray1, 
                                                      learningBitString));
         
-        System.out.printf("Similarity by %s is %.4f percent.\n",
+        System.out.printf("Similarity by %s is %.1f percent.\n",
                           machineLearningBitPredictor.getClass()
                                                      .getSimpleName(),
                           Utils.getSimilarityPercent(predictedArray2, 
@@ -164,13 +169,19 @@ public final class BitPredictorDemo {
         final boolean[] bitString = new boolean[LEARNING_BIT_STRING_LENGTH];
         
         // Initialize the prefix:
-        for (int i = 0; i < PATTERN_LENGTH; i++) {
+        for (int i = 0;
+                 i < Math.min(PATTERN_LENGTH, LEARNING_BIT_STRING_LENGTH);
+                 i++) {
+            
             bitString[i] = random.nextBoolean();
         }
         
         final Map<BitStringView, Boolean> patternMap = getPatternMap(random);
         
-        for (int i = PATTERN_LENGTH; i < bitString.length; i++) {
+        for (int i = PATTERN_LENGTH; 
+                 i < bitString.length; 
+                 i++) {
+            
             final BitStringView bitStringView = 
                     new BitStringView(
                             bitString, 
@@ -191,7 +202,12 @@ public final class BitPredictorDemo {
                 new HashMap<>(toPower(2, PATTERN_LENGTH));
         
         do {
-            final BitStringView bitStringView = new BitStringView(pattern);
+            final BitStringView bitStringView =
+                    new BitStringView(
+                            Arrays.copyOf(
+                                    pattern, 
+                                    pattern.length));
+            
             map.put(bitStringView, random.nextBoolean());
         } 
         while (incrementPattern(pattern));

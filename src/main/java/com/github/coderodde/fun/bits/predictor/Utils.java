@@ -39,6 +39,7 @@ public final class Utils {
             }
         }
         
-        return (double)(mismatches) / (double)(bitString1.length);
+        final double ratio = (double)(mismatches) / (double)(bitString1.length);
+        return ratio * 100.0; // Convert to percents.
     }
 }
