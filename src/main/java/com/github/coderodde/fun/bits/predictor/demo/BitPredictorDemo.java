@@ -17,23 +17,22 @@ public final class BitPredictorDemo {
     
     private static final int PATTERN_LENGTH = 6;
     
-    private static final int LEARNING_PATTERN_MAXMUM_LENGTH = 20;
-    
     public static void main(final String[] args) {
         final long seed = System.currentTimeMillis();
         final Random random = new Random(seed);
         System.out.printf("Seed = %d.\n", seed);
         
         long start = System.currentTimeMillis();
-        final boolean[] learningBitString =
+        boolean[] learningBitString =
                 getRandomWeightedLearningBitString(random, 0.75);
         
-//        final boolean[] learningBitString = getRandomUniformLearningBitString(random);
         long end = System.currentTimeMillis();
         
         System.out.printf(
                 "Constructed the learning bit string in %d milliseconds.\n",
                 end - start);
+        
+        System.out.println("<<< Predicting fully random bit strings >>>");
         
         start = System.currentTimeMillis();
         
@@ -51,7 +50,7 @@ public final class BitPredictorDemo {
         final BitPredictor machineLearningBitPredictor = 
                 new MachineLearningBitPredictor(
                         learningBitString,
-                        LEARNING_PATTERN_MAXMUM_LENGTH, 
+                        PATTERN_LENGTH, 
                         random);
         
         end = System.currentTimeMillis();
@@ -60,12 +59,11 @@ public final class BitPredictorDemo {
                 "Learned the MachineLearningBitPredictor in %d milliseconds.\n", 
                 end - start);
         
-//        System.out.println("<<< ML predictor state >>>");
-//        System.out.println(machineLearningBitPredictor);
-        
         start = System.currentTimeMillis();
-        final boolean[] predictedArray1 = 
+        
+        boolean[] predictedArray1 = 
                 frequencyBitPredictor.predictArray(PREDICTED_BIT_STRING_LENGTH);
+        
         end = System.currentTimeMillis();
         
         System.out.printf("%s predicted in %d milliseconds.\n",
@@ -74,7 +72,7 @@ public final class BitPredictorDemo {
         
         start = System.currentTimeMillis();
         
-        final boolean[] predictedArray2 = 
+        boolean[] predictedArray2 = 
                 machineLearningBitPredictor
                         .predictArray(PREDICTED_BIT_STRING_LENGTH);
         
@@ -95,18 +93,59 @@ public final class BitPredictorDemo {
                                                      .getSimpleName(),
                           Utils.getSimilarityPercent(predictedArray2, 
                                                      learningBitString));
+        
+        System.out.println();
+        System.out.println("<<< Predicting bit strings with patterns >>>");
+        
+        start = System.currentTimeMillis();
+        learningBitString = getBitStringWithPatterns(random);
+        end = System.currentTimeMillis();
+        
+        System.out.printf(
+                "Constructed the patterned learning bit string in " + 
+                        "%d milliseconds.\n",
+                end - start);
+        
+        start = System.currentTimeMillis();
+        
+        predictedArray1 = 
+                frequencyBitPredictor.predictArray(learningBitString.length);
+        
+        end = System.currentTimeMillis();
+        
+        System.out.printf(
+                "%s predicted in %d milliseconds.\n", 
+                frequencyBitPredictor.getClass().getSimpleName(), 
+                end - start);
+        
+        start = System.currentTimeMillis();
+        
+        predictedArray1 = 
+                machineLearningBitPredictor
+                        .predictArray(learningBitString.length);
+        
+        end = System.currentTimeMillis();
+        
+        System.out.printf(
+                "%s predicted in %d milliseconds.\n", 
+                machineLearningBitPredictor.getClass().getSimpleName(), 
+                end - start);
+        
+        System.out.printf("Similarity by %s is %.4f percent.\n",
+                          frequencyBitPredictor.getClass().getSimpleName(),
+                          Utils.getSimilarityPercent(predictedArray1, 
+                                                     learningBitString));
+        
+        System.out.printf("Similarity by %s is %.4f percent.\n",
+                          machineLearningBitPredictor.getClass()
+                                                     .getSimpleName(),
+                          Utils.getSimilarityPercent(predictedArray2, 
+                                                     learningBitString));
     }
     
     private static boolean[] 
         getRandomUniformLearningBitString(final Random random) {
-        
-        final boolean[] bitString = new boolean[LEARNING_BIT_STRING_LENGTH];
-        
-        for (int i = 0; i < bitString.length; i++) {
-            bitString[i] = random.nextBoolean();
-        }
-        
-        return bitString;
+            return getRandomWeightedLearningBitString(random, 0.5);
     }
         
     private static boolean[] 
@@ -146,6 +185,7 @@ public final class BitPredictorDemo {
     
     private static Map<BitStringView, Boolean> 
         getPatternMap(final Random random) {
+            
         final boolean[] pattern = new boolean[PATTERN_LENGTH];
         final Map<BitStringView, Boolean> map = 
                 new HashMap<>(toPower(2, PATTERN_LENGTH));
