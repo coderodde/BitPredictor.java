@@ -12,7 +12,7 @@ public final class BitPredictorDemo {
     private static final int PREDICTED_BIT_STRING_LENGTH =
             LEARNING_BIT_STRING_LENGTH;
     
-    private static final int LEARNING_PATTERN_MAXMUM_LENGTH = 13;
+    private static final int LEARNING_PATTERN_MAXMUM_LENGTH = 2;
     
     public static void main(final String[] args) {
         final long seed = System.currentTimeMillis();
@@ -51,6 +51,9 @@ public final class BitPredictorDemo {
         System.out.printf(
                 "Learned the MachineLearningBitPredictor in %d milliseconds.\n", 
                 end - start);
+        
+        System.out.println("<<< ML predictor state >>>");
+        System.out.println(machineLearningBitPredictor);
         
         start = System.currentTimeMillis();
         final boolean[] predictedArray1 = 

@@ -21,8 +21,8 @@ public final class BitStringTree {
     }
     
     private final BitStringTreeNode root = new BitStringTreeNode();
-    private int size;
-    
+    private int size = 1; // Count the root.
+     
     public void add(final BitStringView bitStringView, 
                     final boolean predictedBit) {
         
@@ -123,7 +123,7 @@ public final class BitStringTree {
                     String.format(
                             formatString2, 
                             lineNumber++, 
-                            textLine.patternToString(), 
+                            textLine.patternString,
                             textLine.bitFrequencies.bit[1],
                             textLine.bitFrequencies.bit[0]));
         }
@@ -140,7 +140,7 @@ public final class BitStringTree {
         
         for (final TextLine textLine : textLineList) {
             tentativeMaximum = Math.max(tentativeMaximum, 
-                                        textLine.patternToString().length());
+                                        textLine.patternString.length());
         }
         
         return tentativeMaximum;
@@ -168,7 +168,7 @@ public final class BitStringTree {
         for (final TextLine textLine : textLineList) {
             tentativeMaximum = 
                     Math.max(tentativeMaximum, 
-                             textLine.get0BitFrequencyNumberLength());
+                             textLine.get1BitFrequencyNumberLength());
         }
         
         return tentativeMaximum;
@@ -196,13 +196,13 @@ public final class BitStringTree {
         final TextLine textLine = new TextLine(nodePath,
                                                root.bitFrequencies);
         
-        // Store the current text line:
-        textLineList.add(textLine);
-        
         // Descend to the left subtree:
         nodePath.addLast(Boolean.FALSE);
         getTextLinesImpl(textLineList, nodePath, root.bit0Child);
         nodePath.removeLast();
+        
+        // Store the current text line:
+        textLineList.add(textLine);
         
         // Descend to the right subtree:
         nodePath.addLast(Boolean.TRUE);
@@ -210,38 +210,35 @@ public final class BitStringTree {
         nodePath.removeLast();
     }
     
-    private List<List<Boolean>> toList() {
-        final List<List<Boolean>> list = new ArrayList<>(size);
-        final Deque<Boolean> bitStack = new ArrayDeque<>();
-        
-        return list;
-    }
-    
-    private static boolean[] toBooleanArray(final Deque<Boolean> bitStack) {
-        final boolean[] bitArray = new boolean[bitStack.size()];
-        int i = 0;
-        
-        for (final Boolean bit : bitStack) {
-            bitArray[i++] = bit;
-        }
-        
-        return bitArray;
-    }
-    
     private static final class TextLine implements Comparable<TextLine> {
-        private final int patternValue;
-        private final Deque<Boolean> bitPattern;
+        private final int patternNumber;
+        private final String patternString;
         private final BitFrequencies bitFrequencies;
         
         TextLine(final Deque<Boolean> bitPattern, 
                  final BitFrequencies bitFrequencies) {
             
-            this.patternValue = getPatternValue(bitPattern);
-            this.bitPattern = bitPattern;
+            this.patternNumber  = getPatternValue(bitPattern);
+            this.patternString  = convertPatternToString(bitPattern);
             this.bitFrequencies = bitFrequencies;
         }
         
-        String patternToString() {
+        @Override
+        public String toString() {
+            final StringBuilder stringBuilder = new StringBuilder();
+            
+            stringBuilder.append("[TextLine | pattern value = ")
+                         .append(patternNumber)
+                         .append(" | bit pattern = ")
+                         .append(patternString)
+                         .append(" | bit freqs = ")
+                         .append(bitFrequencies)
+                         .append("]");
+            
+            return stringBuilder.toString();
+        }
+        
+        String convertPatternToString(final Deque<Boolean> bitPattern) {
             final StringBuilder stringBuilder = new StringBuilder();
             
             for (final Boolean bit : bitPattern) {
@@ -249,10 +246,6 @@ public final class BitStringTree {
             }
             
             return stringBuilder.toString();
-        }
-        
-        BitFrequencies getBitFrequencies() {
-            return bitFrequencies;
         }
         
         int get1BitFrequencyNumberLength() {
@@ -265,7 +258,7 @@ public final class BitStringTree {
         
         @Override
         public int compareTo(final TextLine o) {
-            return Integer.compare(patternValue, o.patternValue);
+            return patternString.compareTo(o.patternString);
         }
         
         private static int getPatternValue(final Deque<Boolean> bitPattern) {
