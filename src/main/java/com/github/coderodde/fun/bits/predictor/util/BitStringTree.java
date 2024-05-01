@@ -76,10 +76,6 @@ public final class BitStringTree {
                 
                 node = node.bit0Child;
             }
-            
-            if (node == null) {
-                return null;
-            }
         }
         
         return node.bitFrequencies;

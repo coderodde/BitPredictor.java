@@ -6,7 +6,8 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- * This class implements a 
+ * This class implements a machine learning approach to predicting the bit 
+ * strings.
  */
 public final class MachineLearningBitPredictor implements BitPredictor {
     
@@ -108,7 +109,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     }
     
     private void learnModel() {
-        for (int patternLength = 1; 
+        for (int patternLength = 0; 
                  patternLength <= maximumPatternLength; 
                  patternLength++) {
             
