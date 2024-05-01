@@ -41,7 +41,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
     public boolean predict(final BitStringView bitStringView) {
         // Start from the largest pattern lengths:
         for (int patternLength = maximumPatternLength; 
-                 patternLength > 0; 
+                 patternLength >= 0; 
                  patternLength--) {
             
             if (patternLength > bitStringView.length()) {
@@ -53,6 +53,8 @@ public final class MachineLearningBitPredictor implements BitPredictor {
             // Get the patternLength long pattern suffix:
             final BitStringView patternSuffixView = 
                     getPatternSuffix(bitStringView, patternLength);
+            
+            patternSuffixView.contractFromTail(bits.length);
             
             // Grab the bit frequencies:
             final BitFrequencies bitFrequencies = 
@@ -75,7 +77,15 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         
         final boolean[] predictedArray = new boolean[bits.length];
         
-        predictedArray[0] = bits[0];
+        for (int i = 0; i < length; i++) {
+            final BitStringView bitStringView =
+                    new BitStringView(
+                            bits,
+                            i,
+                            maximumPatternLength);
+            
+            predictedArray[i] = predict(bitStringView);
+        }
         
         return predictedArray;
     }

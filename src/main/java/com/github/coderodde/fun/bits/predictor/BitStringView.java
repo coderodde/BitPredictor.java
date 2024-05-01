@@ -3,7 +3,7 @@ package com.github.coderodde.fun.bits.predictor;
 public class BitStringView {
     private final boolean[] bits;
     private final int startIndex;
-    private final int length;
+    private int length;
     
     public BitStringView(final boolean[] bits,
                          final int startIndex,
@@ -27,6 +27,12 @@ public class BitStringView {
     
     public int getStartIndex() {
         return startIndex;
+    }
+    
+    public void contractFromTail(final int bitStringLength) {
+        if (startIndex + length > bitStringLength) {
+            length -= startIndex + length - bitStringLength;
+        }
     }
     
     @Override

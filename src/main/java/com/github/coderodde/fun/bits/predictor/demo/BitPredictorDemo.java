@@ -20,7 +20,10 @@ public final class BitPredictorDemo {
         System.out.printf("Seed = %d.\n", seed);
         
         long start = System.currentTimeMillis();
-        final boolean[] learningBitString = getRandomLearningBitString(random);
+        final boolean[] learningBitString =
+                getRandomWeightedLearningBitString(random, 0.75);
+        
+//        final boolean[] learningBitString = getRandomUniformLearningBitString(random);
         long end = System.currentTimeMillis();
         
         System.out.printf(
@@ -65,9 +68,11 @@ public final class BitPredictorDemo {
                           end - start);
         
         start = System.currentTimeMillis();
+        
         final boolean[] predictedArray2 = 
                 machineLearningBitPredictor
                         .predictArray(PREDICTED_BIT_STRING_LENGTH);
+        
         end = System.currentTimeMillis();
         
         System.out.printf("%s predicted in %d milliseconds.\n",
@@ -87,11 +92,25 @@ public final class BitPredictorDemo {
                                                      learningBitString));
     }
     
-    private static boolean[] getRandomLearningBitString(final Random random) {
+    private static boolean[] 
+        getRandomUniformLearningBitString(final Random random) {
+            
         final boolean[] bitString = new boolean[LEARNING_BIT_STRING_LENGTH];
         
         for (int i = 0; i < bitString.length; i++) {
             bitString[i] = random.nextBoolean();
+        }
+        
+        return bitString;
+    }
+        
+    private static boolean[] 
+            getRandomWeightedLearningBitString(final Random random,
+                                               final double weight) {
+        final boolean[] bitString = new boolean[LEARNING_BIT_STRING_LENGTH];
+        
+        for (int i = 0; i < bitString.length; i++) {
+            bitString[i] = random.nextDouble() < weight;
         }
         
         return bitString;
