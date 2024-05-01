@@ -13,6 +13,10 @@ public class BitStringView {
         this.length = length;
     }
     
+    public BitStringView(final boolean[] bits) {
+        this(bits, 0, bits.length);
+    }
+    
     public int length() {
         return length;
     }
@@ -23,5 +27,16 @@ public class BitStringView {
     
     public int getStartIndex() {
         return startIndex;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder stringBuilder = new StringBuilder(length);
+        
+        for (int i = 0; i < length; i++) {
+            stringBuilder.append((get(i) ? "1" : "0"));
+        }
+        
+        return stringBuilder.toString();
     }
 }

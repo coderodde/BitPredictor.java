@@ -20,30 +20,15 @@ public final class BitStringTree {
         }
     }
     
-    private BitStringTreeNode root;
+    private final BitStringTreeNode root = new BitStringTreeNode();
     private int size;
     
     public void add(final BitStringView bitStringView, 
                     final boolean predictedBit) {
         
-        if (root == null) {
-            root = new BitStringTreeNode();
-            size = 1;
-        }
-
-        if (predictedBit) {
-            root.bitFrequencies.bit[1]++;
-        } else {
-            root.bitFrequencies.bit[0]++;
-        }
-        
         BitStringTreeNode current = root;
         
         for (int i = 0; i < bitStringView.length(); i++) {
-            if (current == null) {
-                return;
-            }
-            
             final boolean bit = bitStringView.get(i);
             
             if (bit) {
@@ -52,7 +37,7 @@ public final class BitStringTree {
                     size++;
                 }
                 
-                current.bitFrequencies.bit[1]++;
+                current.bitFrequencies.inc1();
                 current = current.bit1Child;
             } else {
                 if (current.bit0Child == null) {
@@ -60,9 +45,15 @@ public final class BitStringTree {
                     size++;
                 }
                 
-                current.bitFrequencies.bit[0]++;
+                current.bitFrequencies.inc0();
                 current = current.bit0Child;
             }    
+        }
+        
+        if (predictedBit) {
+            current.bitFrequencies.inc1();
+        } else {
+            current.bitFrequencies.inc0();
         }
     }
     
@@ -74,16 +65,20 @@ public final class BitStringTree {
             
             if (bit) {
                 if (node.bit1Child == null) {
-                    return node.bitFrequencies;
+                    return null;
                 }
                 
                 node = node.bit1Child;
             } else {
                 if (node.bit0Child == null) {
-                    return node.bitFrequencies;
+                    return null;
                 }
                 
                 node = node.bit0Child;
+            }
+            
+            if (node == null) {
+                return null;
             }
         }
         
