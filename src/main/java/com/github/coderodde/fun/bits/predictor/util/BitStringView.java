@@ -1,4 +1,4 @@
-package com.github.coderodde.fun.bits.predictor;
+package com.github.coderodde.fun.bits.predictor.util;
 
 import java.util.Arrays;
 

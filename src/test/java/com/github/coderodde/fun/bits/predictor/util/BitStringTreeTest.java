@@ -1,7 +1,5 @@
 package com.github.coderodde.fun.bits.predictor.util;
 
-import com.github.coderodde.fun.bits.predictor.BitFrequencies;
-import com.github.coderodde.fun.bits.predictor.BitStringView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
@@ -21,17 +19,17 @@ public final class BitStringTreeTest {
         tree.add(bitStringView, false);
         tree.add(bitStringView, false);
         
-        BitFrequencies bf = new BitFrequencies(5, 0);
+        BitFrequencyDistribution bf = new BitFrequencyDistribution(5, 0);
         
         assertEquals(tree.get(new BitStringView(new boolean[]{})), bf);
         
-        bf = new BitFrequencies(0, 5);
+        bf = new BitFrequencyDistribution(0, 5);
         
         assertEquals(tree.get(new BitStringView(new boolean[]{ false })), bf);
         assertEquals(tree.get(new BitStringView(new boolean[]{ false,
                                                                true })), bf);
         
-        bf = new BitFrequencies(2, 3);
+        bf = new BitFrequencyDistribution(2, 3);
         
         assertEquals(tree.get(new BitStringView(new boolean[]{ false, 
                                                                true,

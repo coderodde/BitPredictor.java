@@ -1,5 +1,7 @@
 package com.github.coderodde.fun.bits.predictor;
 
+import com.github.coderodde.fun.bits.predictor.util.BitStringView;
+
 /**
  * This interface define the API for predicting bit strings.
  */

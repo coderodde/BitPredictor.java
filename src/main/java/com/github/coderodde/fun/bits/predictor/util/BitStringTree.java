@@ -1,7 +1,5 @@
 package com.github.coderodde.fun.bits.predictor.util;
 
-import com.github.coderodde.fun.bits.predictor.BitFrequencies;
-import com.github.coderodde.fun.bits.predictor.BitStringView;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +11,10 @@ public final class BitStringTree {
     private static final class BitStringTreeNode {
         BitStringTreeNode bit0Child;
         BitStringTreeNode bit1Child;
-        BitFrequencies bitFrequencies;
+        BitFrequencyDistribution bitFrequencies;
         
         BitStringTreeNode() {
-            this.bitFrequencies = new BitFrequencies();
+            this.bitFrequencies = new BitFrequencyDistribution();
         }
     }
     
@@ -57,7 +55,7 @@ public final class BitStringTree {
         }
     }
     
-    public BitFrequencies get(final BitStringView bitStringView) {
+    public BitFrequencyDistribution get(final BitStringView bitStringView) {
         BitStringTreeNode node = root;
         
         for (int i = 0; i < bitStringView.length(); i++) {
@@ -213,10 +211,10 @@ public final class BitStringTree {
     private static final class TextLine implements Comparable<TextLine> {
         private final int patternNumber;
         private final String patternString;
-        private final BitFrequencies bitFrequencies;
+        private final BitFrequencyDistribution bitFrequencies;
         
         TextLine(final Deque<Boolean> bitPattern, 
-                 final BitFrequencies bitFrequencies) {
+                 final BitFrequencyDistribution bitFrequencies) {
             
             this.patternNumber  = getPatternValue(bitPattern);
             this.patternString  = convertPatternToString(bitPattern);

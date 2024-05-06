@@ -1,6 +1,9 @@
-package com.github.coderodde.fun.bits.predictor;
+package com.github.coderodde.fun.bits.predictor.impl;
 
-import static com.github.coderodde.fun.bits.predictor.Utils.checkIsPositiveValue;
+import com.github.coderodde.fun.bits.predictor.BitPredictor;
+import com.github.coderodde.fun.bits.predictor.util.BitStringView;
+import com.github.coderodde.fun.bits.predictor.util.BitFrequencyDistribution;
+import static com.github.coderodde.fun.bits.predictor.util.Utils.checkIsPositiveValue;
 import java.util.Objects;
 import java.util.Random;
 
@@ -8,7 +11,8 @@ public final class FrequencyBitPredictor implements BitPredictor {
 
     private final Random random;
     private final boolean[] learningBitString;
-    private final BitFrequencies bitFrequencies = new BitFrequencies();
+    private final BitFrequencyDistribution bitFrequencies = 
+              new BitFrequencyDistribution();
     
     public FrequencyBitPredictor(final boolean[] learningBitString,
                                  final Random random) {

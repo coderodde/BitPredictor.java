@@ -1,10 +1,10 @@
 package com.github.coderodde.fun.bits.predictor.demo;
 
 import com.github.coderodde.fun.bits.predictor.BitPredictor;
-import com.github.coderodde.fun.bits.predictor.BitStringView;
-import com.github.coderodde.fun.bits.predictor.FrequencyBitPredictor;
-import com.github.coderodde.fun.bits.predictor.MachineLearningBitPredictor;
-import com.github.coderodde.fun.bits.predictor.Utils;
+import com.github.coderodde.fun.bits.predictor.util.BitStringView;
+import com.github.coderodde.fun.bits.predictor.impl.FrequencyBitPredictor;
+import com.github.coderodde.fun.bits.predictor.impl.MachineLearningBitPredictor;
+import com.github.coderodde.fun.bits.predictor.util.Utils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ public final class BitPredictorDemo {
     private static final int PREDICTED_BIT_STRING_LENGTH =
             LEARNING_BIT_STRING_LENGTH;
     
-    private static final int PATTERN_LENGTH = 20;
+    private static final int PATTERN_LENGTH = 2;
     
     public static void main(final String[] args) {
         final long seed = 1714559375492L; //System.currentTimeMillis();
@@ -25,7 +25,10 @@ public final class BitPredictorDemo {
         
         long start = System.currentTimeMillis();
         boolean[] learningBitString =
-                getRandomWeightedLearningBitString(random, 0.75);
+                Utils.getRandomWeightedLearningBitString(
+                        random,
+                        0.75,
+                        LEARNING_BIT_STRING_LENGTH);
         
         long end = System.currentTimeMillis();
         
@@ -101,7 +104,11 @@ public final class BitPredictorDemo {
         System.out.println("<<< Predicting bit strings with patterns >>>");
         
         start = System.currentTimeMillis();
-        learningBitString = getBitStringWithPatterns(random);
+        learningBitString = 
+                Utils.getBitStringWithPatterns(
+                        random, 
+                        PATTERN_LENGTH, 
+                        LEARNING_BIT_STRING_LENGTH);
         end = System.currentTimeMillis();
         
         System.out.printf(
@@ -146,98 +153,5 @@ public final class BitPredictorDemo {
                                                      .getSimpleName(),
                           Utils.getSimilarityPercent(predictedArray2, 
                                                      learningBitString));
-    }
-    
-    private static boolean[] 
-        getRandomUniformLearningBitString(final Random random) {
-            return getRandomWeightedLearningBitString(random, 0.5);
-    }
-        
-    private static boolean[] 
-            getRandomWeightedLearningBitString(final Random random,
-                                               final double weight) {
-        final boolean[] bitString = new boolean[LEARNING_BIT_STRING_LENGTH];
-        
-        for (int i = 0; i < bitString.length; i++) {
-            bitString[i] = random.nextDouble() < weight;
-        }
-        
-        return bitString;
-    }
-            
-    private static boolean[] getBitStringWithPatterns(final Random random) {
-        final boolean[] bitString = new boolean[LEARNING_BIT_STRING_LENGTH];
-        
-        // Initialize the prefix:
-        for (int i = 0;
-                 i < Math.min(PATTERN_LENGTH, LEARNING_BIT_STRING_LENGTH);
-                 i++) {
-            
-            bitString[i] = random.nextBoolean();
-        }
-        
-        final Map<BitStringView, Boolean> patternMap = getPatternMap(random);
-        
-        for (int i = PATTERN_LENGTH; 
-                 i < bitString.length; 
-                 i++) {
-            
-            final BitStringView bitStringView = 
-                    new BitStringView(
-                            bitString, 
-                            i - PATTERN_LENGTH, 
-                            PATTERN_LENGTH);
-            
-            bitString[i] = patternMap.get(bitStringView);
-        }
-        
-        return bitString;
-    }
-    
-    private static Map<BitStringView, Boolean> 
-        getPatternMap(final Random random) {
-            
-        final boolean[] pattern = new boolean[PATTERN_LENGTH];
-        final Map<BitStringView, Boolean> map = 
-                new HashMap<>(toPower(2, PATTERN_LENGTH));
-        
-        do {
-            final BitStringView bitStringView =
-                    new BitStringView(
-                            Arrays.copyOf(
-                                    pattern, 
-                                    pattern.length));
-            
-            map.put(bitStringView, random.nextBoolean());
-        } 
-        while (incrementPattern(pattern));
-        
-        return map;
-    }
-        
-    private static boolean incrementPattern(final boolean[] pattern) {
-        for (int i = 0; i < pattern.length; i++) {
-            if (pattern[i] == false) {
-                pattern[i] = true;
-                
-                for (int j = 0; j < i; j++) {
-                    pattern[j] = false;
-                }
-                
-                return true;
-            }
-        }
-        
-        return false;
-    }
-        
-    private static int toPower(int base, int exponent) {
-        int result = 1;
-        
-        for (int i = 0; i < exponent; i++) {
-            result *= base;
-        }
-        
-        return result;
     }
 }

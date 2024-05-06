@@ -1,6 +1,9 @@
-package com.github.coderodde.fun.bits.predictor;
+package com.github.coderodde.fun.bits.predictor.impl;
 
-import static com.github.coderodde.fun.bits.predictor.Utils.checkIsPositiveValue;
+import com.github.coderodde.fun.bits.predictor.BitPredictor;
+import com.github.coderodde.fun.bits.predictor.util.BitStringView;
+import com.github.coderodde.fun.bits.predictor.util.BitFrequencyDistribution;
+import static com.github.coderodde.fun.bits.predictor.util.Utils.checkIsPositiveValue;
 import com.github.coderodde.fun.bits.predictor.util.BitStringTree;
 import java.util.Objects;
 import java.util.Random;
@@ -57,7 +60,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
             patternSuffixView.contractFromTail(bits.length);
             
             // Grab the bit frequencies:
-            final BitFrequencies bitFrequencies = 
+            final BitFrequencyDistribution bitFrequencies = 
                     bitStringTree.get(patternSuffixView);
             
             if (bitFrequencies != null) {
@@ -149,7 +152,7 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                         patternLength);
         
         final boolean bitToPredict = bits[patternStartIndex + patternLength];
-        final BitFrequencies bitFrequencies = bitStringTree.get(pattern);
+        final BitFrequencyDistribution bitFrequencies = bitStringTree.get(pattern);
         
         if (bitFrequencies != null) {
             if (bitToPredict) {

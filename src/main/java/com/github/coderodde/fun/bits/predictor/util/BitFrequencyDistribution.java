@@ -1,16 +1,16 @@
-package com.github.coderodde.fun.bits.predictor;
+package com.github.coderodde.fun.bits.predictor.util;
 
 import java.util.Random;
 
-public final class BitFrequencies {
+public final class BitFrequencyDistribution {
 
     public int[] bit;
     
-    public BitFrequencies() {
+    public BitFrequencyDistribution() {
         this.bit = new int[2];
     }
     
-    public BitFrequencies(final int bit0, final int bit1) {
+    public BitFrequencyDistribution(final int bit0, final int bit1) {
         this();
         this.bit[0] = bit0;
         this.bit[1] = bit1;
@@ -38,11 +38,15 @@ public final class BitFrequencies {
     
     @Override
     public boolean equals(final Object o) {
-        final BitFrequencies other = (BitFrequencies) o;
+        final BitFrequencyDistribution other = (BitFrequencyDistribution) o;
         return bit[0] == other.bit[0] && bit[1] == other.bit[1];
     }
 
-    boolean sample(final Random random) {
-        return random.nextInt(bit[0] + bit[1]) < bit[0];
+    public boolean sample(final Random random) {
+        if (bit[0] == 0 && bit[1] == 0) {
+            return random.nextBoolean();
+        }
+        
+        return random.nextInt(bit[0] + bit[1]) < bit[1];
     }
 }
