@@ -93,7 +93,7 @@ public final class Utils {
             final BitStringView bitStringView = 
                     new BitStringView(
                             bitString, 
-                            i - patternLength, 
+                            i, 
                             patternLength);
             
             bitString[i] = patternMap.get(bitStringView).sample(random);
