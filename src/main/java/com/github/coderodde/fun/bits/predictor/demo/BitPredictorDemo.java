@@ -10,7 +10,7 @@ public final class BitPredictorDemo {
     
     public static void main(final String[] args) {
         final long seed = System.currentTimeMillis();
-        final int patternLength = 6;
+        final int patternLength = 5;
         final int bitStringLength = 30;
         final Random random = new Random(seed);
         
@@ -19,37 +19,33 @@ public final class BitPredictorDemo {
         final boolean[] bits = 
                 Utils.getRandomWeightedLearningBitString(
                         random, 
-                        0.5, 
+                        0.7, 
                         bitStringLength);
-        
-//        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
-//                                                              patternLength, 
-//                                                              bitStringLength);
         
         System.out.printf("Bits: %s.\n", toBitString(bits));
         
         final BitPredictor predictor = 
                 new MachineLearningBitPredictor(bits, patternLength, random);
         
-        System.out.println("<<< Predictor state >>>");
+        System.out.println("<<< Machine learning predictor state >>>");
         System.out.println(predictor);
         
         final boolean[] predictedArray = 
                 predictor.predictArray(bitStringLength);
         
         System.out.printf(
-                "%.4f\n", 
+                "Machine learning predictor similarity = %.4f\n", 
                 Utils.getSimilarityPercent(bits, 
                                            predictedArray));
         
         final BitPredictor predictor2 = 
                 new FrequencyBitPredictor(bits, random);
-        
+       
         final boolean[] predictedArray2 = 
                 predictor2.predictArray(bitStringLength);
         
         System.out.printf(
-                "%.4f\n", 
+                "Naive learning predictor similarity = %.4f\n", 
                 Utils.getSimilarityPercent(bits, 
                                            predictedArray2));
     }
