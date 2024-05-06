@@ -1,13 +1,9 @@
 package com.github.coderodde.fun.bits.predictor.demo;
 
 import com.github.coderodde.fun.bits.predictor.BitPredictor;
-import com.github.coderodde.fun.bits.predictor.util.BitStringView;
 import com.github.coderodde.fun.bits.predictor.impl.FrequencyBitPredictor;
 import com.github.coderodde.fun.bits.predictor.impl.MachineLearningBitPredictor;
 import com.github.coderodde.fun.bits.predictor.util.Utils;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public final class BitPredictorDemo {

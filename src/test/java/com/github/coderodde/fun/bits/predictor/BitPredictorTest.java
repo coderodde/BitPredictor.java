@@ -13,10 +13,10 @@ public final class BitPredictorTest {
         final int patternLength = 2;
         final int bitStringLength = 6;
         final Random random = new Random(13L);
-        final boolean[] bits = { true, false, true, true, false, true, true };
-//        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
-//                                                              patternLength, 
-//                                                              bitStringLength);
+//        final boolean[] bits = { true, false, true, true, false, true, true };
+        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
+                                                              patternLength, 
+                                                              bitStringLength);
         
         final BitPredictor predictor1 = new FrequencyBitPredictor(bits, random);
         

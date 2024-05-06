@@ -156,9 +156,9 @@ public final class MachineLearningBitPredictor implements BitPredictor {
         
         if (bitFrequencies != null) {
             if (bitToPredict) {
-                bitFrequencies.inc1();
+                bitFrequencies.incrementOneBitCounter();
             } else {
-                bitFrequencies.inc0();
+                bitFrequencies.incrementZeroBitCounter();
             }
         } else {
             bitStringTree.add(pattern, bitToPredict);

@@ -1,7 +1,5 @@
 package com.github.coderodde.fun.bits.predictor.util;
 
-import java.util.Arrays;
-
 public class BitStringView {
     private final boolean[] bits;
     private final int startIndex;
@@ -58,6 +56,16 @@ public class BitStringView {
         }
         
         return result;
+    }
+    
+    public boolean equals(final boolean[] bits, final int startIndex) {
+        for (int i = startIndex, j = 0; j < length(); j++, i++) {
+            if (bits[i] != get(j)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     @Override

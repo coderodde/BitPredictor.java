@@ -2,6 +2,7 @@ package com.github.coderodde.fun.bits.predictor.util;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -69,19 +70,22 @@ public final class Utils {
             
         final boolean[] bitString = new boolean[learningBitStringLength];
         
-        // Initialize the prefix:
-        for (int i = 0;
-                 i < Math.min(patternLength, learningBitStringLength);
-                 i++) {
-            
-            bitString[i] = random.nextBoolean();
-        }
-        
-        final Map<BitStringView, Boolean> patternMap =
-                getPatternMap(random,
-                              patternLength,
+        // Get the map mapping each pattern to its successor bit:
+        final Map<BitStringView, BitFrequencyDistribution> patternMap =
+                getPatternMap(patternLength,
                               bitString);
         
+        // Choose randomly the bit string that will be set to the head of the
+        // resulting bit string:
+        final BitStringView initialHeadBitStringView = 
+                getRandomHeadBitStringView(patternMap, random);
+        
+        // Mark the pattern prefix:
+        for (int i = 0; i < initialHeadBitStringView.length(); i++) {
+            bitString[i] = initialHeadBitStringView.get(i);
+        }
+        
+        // Mark the rest of the bit string:
         for (int i = patternLength; 
                  i < bitString.length; 
                  i++) {
@@ -92,19 +96,33 @@ public final class Utils {
                             i - patternLength, 
                             patternLength);
             
-            bitString[i] = patternMap.get(bitStringView);
+            bitString[i] = patternMap.get(bitStringView).sample(random);
         }
         
         return bitString;
     }
+        
+    private static BitStringView 
+        getRandomHeadBitStringView(
+                final Map<BitStringView, BitFrequencyDistribution> patternMap, 
+                final Random random) {
+            
+        final Iterator<BitStringView> iterator = patternMap.keySet().iterator();
+        final int targetIndex = random.nextInt(patternMap.size());
+        
+        for (int i = 0; i < targetIndex; i++) {
+            iterator.next();
+        }
+        
+        return iterator.next();
+    }
     
-    private static Map<BitStringView, Boolean> 
-        getPatternMap(final Random random, 
-                      final int patternLength,
+    private static Map<BitStringView, BitFrequencyDistribution> 
+        getPatternMap(final int patternLength,
                       final boolean[] bitString) {
             
         final boolean[] pattern = new boolean[patternLength];
-        final Map<BitStringView, Boolean> map = 
+        final Map<BitStringView, BitFrequencyDistribution> map = 
                 new HashMap<>(getMapCapacity(patternLength));
         
         do {
@@ -114,13 +132,42 @@ public final class Utils {
                                     pattern, 
                                     pattern.length));
             
-            map.put(bitStringView, getMostProbableBoolean(random, 
-                                                          bitString,
-                                                          bitStringView));
+            map.put(bitStringView, 
+                    getBitFrequencyDistributionFor(bitStringView,
+                                                   bitString));
         } 
         while (incrementPattern(pattern));
         
         return map;
+    }
+        
+    private static BitFrequencyDistribution 
+        getBitFrequencyDistributionFor(final BitStringView bitStringView,
+                                       final boolean[] bitString) {
+            
+        final BitFrequencyDistribution bitFrequencyDistribution = 
+          new BitFrequencyDistribution();
+        
+        for (int i = 0; i < bitString.length - bitStringView.length(); i++) {
+            final BitStringView window =
+                    new BitStringView(
+                            bitString,
+                            i,
+                            bitStringView.length());
+            
+            if (window.equals(bitString, i)) {
+                final boolean successorBit =
+                        bitString[bitStringView.length() + i];
+                
+                if (successorBit) {
+                    bitFrequencyDistribution.incrementOneBitCounter();
+                } else {
+                    bitFrequencyDistribution.incrementZeroBitCounter();
+                }
+            }
+        }
+        
+        return bitFrequencyDistribution;
     }
         
     private static boolean getMostProbableBoolean(final Random random,
@@ -135,14 +182,14 @@ public final class Utils {
             if (matchesBitString(bitString, 
                                  startIndex,
                                  pattern)
-                    && startIndex < bitString.length - pattern.length() - 1) {
+                    && startIndex < bitString.length - pattern.length()) {
                 final boolean successorBit =
                         bitString[startIndex + pattern.length()];
                 
                 if (successorBit) {
-                    distribution.inc1();
+                    distribution.incrementOneBitCounter();
                 } else {
-                    distribution.inc0();
+                    distribution.incrementZeroBitCounter();
                 }
             }
         }

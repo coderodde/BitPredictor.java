@@ -35,7 +35,7 @@ public final class BitStringTree {
                     size++;
                 }
                 
-                current.bitFrequencies.inc1();
+                current.bitFrequencies.incrementOneBitCounter();
                 current = current.bit1Child;
             } else {
                 if (current.bit0Child == null) {
@@ -43,15 +43,15 @@ public final class BitStringTree {
                     size++;
                 }
                 
-                current.bitFrequencies.inc0();
+                current.bitFrequencies.incrementZeroBitCounter();
                 current = current.bit0Child;
             }    
         }
         
         if (predictedBit) {
-            current.bitFrequencies.inc1();
+            current.bitFrequencies.incrementOneBitCounter();
         } else {
-            current.bitFrequencies.inc0();
+            current.bitFrequencies.incrementZeroBitCounter();
         }
     }
     

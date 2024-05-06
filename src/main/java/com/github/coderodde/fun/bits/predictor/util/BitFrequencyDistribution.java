@@ -16,11 +16,11 @@ public final class BitFrequencyDistribution {
         this.bit[1] = bit1;
     }
     
-    public void inc0() {
+    public void incrementZeroBitCounter() {
         bit[0]++;
     }
     
-    public void inc1() {
+    public void incrementOneBitCounter() {
         bit[1]++;
     }
 
@@ -44,6 +44,7 @@ public final class BitFrequencyDistribution {
 
     public boolean sample(final Random random) {
         if (bit[0] == 0 && bit[1] == 0) {
+            // In order to avoid 'random.nextInt(0)':
             return random.nextBoolean();
         }
         

@@ -9,13 +9,13 @@ public final class MachineLearningBitPredictorTest {
     
     @Test
     public void predict1() {
-        final int patternLength = 2;
-        final int bitStringLength = 6;
+        final int patternLength = 3;
+        final int bitStringLength = 30;
         final Random random = new Random(13L);
-        final boolean[] bits = { true, false, true, true, false, true };
-//        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
-//                                                              patternLength, 
-//                                                              bitStringLength);
+//        final boolean[] bits = { true, false, true, true };
+        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
+                                                              patternLength, 
+                                                              bitStringLength);
         final BitPredictor predictor = 
                 new MachineLearningBitPredictor(bits, patternLength, random);
         
