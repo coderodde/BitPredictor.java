@@ -12,11 +12,15 @@ public final class MachineLearningBitPredictorTest {
         final int patternLength = 2;
         final int bitStringLength = 6;
         final Random random = new Random(13L);
-        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
-                                                              patternLength, 
-                                                              bitStringLength);
+        final boolean[] bits = { true, false, true, true, false, true };
+//        final boolean[] bits = Utils.getBitStringWithPatterns(random, 
+//                                                              patternLength, 
+//                                                              bitStringLength);
         final BitPredictor predictor = 
                 new MachineLearningBitPredictor(bits, patternLength, random);
+        
+        System.out.println("<<< Predictor state >>>");
+        System.out.println(predictor);
         
         final boolean[] predictedArray = 
                 predictor.predictArray(bitStringLength);
