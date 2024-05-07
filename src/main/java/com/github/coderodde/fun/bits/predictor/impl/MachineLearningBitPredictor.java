@@ -152,7 +152,8 @@ public final class MachineLearningBitPredictor implements BitPredictor {
                         patternLength);
         
         final boolean bitToPredict = bits[patternStartIndex + patternLength];
-        final BitFrequencyDistribution bitFrequencies = bitStringTree.get(pattern);
+        final BitFrequencyDistribution bitFrequencies =
+                bitStringTree.get(pattern);
         
         if (bitFrequencies != null) {
             if (bitToPredict) {

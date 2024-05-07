@@ -7,14 +7,14 @@ import static com.github.coderodde.fun.bits.predictor.util.Utils.checkIsPositive
 import java.util.Objects;
 import java.util.Random;
 
-public final class FrequencyBitPredictor implements BitPredictor {
+public final class NaiveFrequencyBitPredictor implements BitPredictor {
 
     private final Random random;
     private final boolean[] learningBitString;
     private final BitFrequencyDistribution bitFrequencies = 
               new BitFrequencyDistribution();
     
-    public FrequencyBitPredictor(final boolean[] learningBitString,
+    public NaiveFrequencyBitPredictor(final boolean[] learningBitString,
                                  final Random random) {
         this.learningBitString =
                 Objects.requireNonNull(
